@@ -1,0 +1,13 @@
+# legal-ai-assistant/.gitignore
+venv/
+__pycache__/
+*.pyc
+.env
+*.json
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+*.sqlite3
+.DS_Store

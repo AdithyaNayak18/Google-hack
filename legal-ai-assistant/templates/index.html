@@ -1,0 +1,43 @@
+<!-- legal-ai-assistant/templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Legal AI Assistant</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Legal AI Assistant</h1>
+            <p>Paste your legal document below to get started</p>
+        </header>
+        
+        <div class="main-content">
+            <div class="input-section">
+                <textarea id="document-text" placeholder="Paste your legal document here..."></textarea>
+                <div class="button-group">
+                    <button id="summarize-btn">Summarize</button>
+                    <button id="ask-btn" disabled>Ask Question</button>
+                </div>
+                
+                <div id="question-container" style="display: none;">
+                    <input type="text" id="question-input" placeholder="Ask a question about the document...">
+                    <button id="submit-question">Submit</button>
+                </div>
+            </div>
+            
+            <div class="output-section">
+                <div id="loading" class="hidden">
+                    <div class="spinner"></div>
+                    <p>Processing your request...</p>
+                </div>
+                <div id="output"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
