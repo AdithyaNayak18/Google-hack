@@ -11,29 +11,34 @@
     <div class="container">
         <header>
             <h1>Legal AI Assistant</h1>
-            <p>Paste your legal document below to get started</p>
+            <p>Upload or paste your legal document below to get started</p>
         </header>
-        
-        <div class="main-content">
-            <div class="input-section">
-                <textarea id="document-text" placeholder="Paste your legal document here..."></textarea>
+
+        <div class="input-section">
+            <div class="document-input">
+                <h2>Document</h2>
+                <textarea id="documentText" placeholder="Paste your legal document here..."></textarea>
                 <div class="button-group">
-                    <button id="summarize-btn">Summarize</button>
-                    <button id="ask-btn" disabled>Ask Question</button>
-                </div>
-                
-                <div id="question-container" style="display: none;">
-                    <input type="text" id="question-input" placeholder="Ask a question about the document...">
-                    <button id="submit-question">Submit</button>
+                    <button id="summarizeBtn">Summarize</button>
+                    <button id="clearBtn">Clear</button>
                 </div>
             </div>
-            
-            <div class="output-section">
-                <div id="loading" class="hidden">
+
+            <div class="question-input">
+                <h2>Ask a Question</h2>
+                <input type="text" id="questionInput" placeholder="Ask a question about the document...">
+                <button id="askBtn">Ask</button>
+            </div>
+        </div>
+
+        <div class="output-section">
+            <div class="output-container">
+                <h2>Output</h2>
+                <div id="output" class="output-content"></div>
+                <div id="loading" class="loading-spinner" style="display: none;">
                     <div class="spinner"></div>
-                    <p>Processing your request...</p>
+                    <p>Processing...</p>
                 </div>
-                <div id="output"></div>
             </div>
         </div>
     </div>

@@ -1,105 +1,130 @@
-// legal-ai-assistant/static/js/main.js
-document.addEventListener('DOMContentLoaded', () => {
-    const documentText = document.getElementById('document-text');
-    const summarizeBtn = document.getElementById('summarize-btn');
-    const askBtn = document.getElementById('ask-btn');
-    const questionContainer = document.getElementById('question-container');
-    const questionInput = document.getElementById('question-input');
-    const submitQuestion = document.getElementById('submit-question');
-    const output = document.getElementById('output');
-    const loading = document.getElementById('loading');
+document.addEventListener('DOMContentLoaded', function() {
+    // DOM Elements
+    const documentText = document.getElementById('documentText');
+    const questionInput = document.getElementById('questionInput');
+    const summarizeBtn = document.getElementById('summarizeBtn');
+    const askBtn = document.getElementById('askBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const outputDiv = document.getElementById('output');
+    const loadingSpinner = document.getElementById('loading');
 
-    // Toggle question input
-    askBtn.addEventListener('click', () => {
-        questionContainer.style.display = 'block';
-        questionInput.focus();
-    });
-
-    // Handle summarize button click
-    summarizeBtn.addEventListener('click', async () => {
-        const text = documentText.value.trim();
-        if (!text) {
-            alert('Please enter some text to summarize');
-            return;
-        }
-
-        await processRequest('/api/summarize', { text }, 'summary');
-    });
-
-    // Handle question submission
-    submitQuestion.addEventListener('click', async () => {
-        const text = documentText.value.trim();
-        const question = questionInput.value.trim();
-        
-        if (!question) {
-            alert('Please enter a question');
-            return;
-        }
-
-        await processRequest('/api/ask', { 
-            text, 
-            question 
-        }, 'answer');
-    });
-
-    // Enable/disable ask button based on text input
-    documentText.addEventListener('input', () => {
-        askBtn.disabled = !documentText.value.trim();
-    });
-
-    // Allow Enter key to submit question
-    questionInput.addEventListener('keypress', (e) => {
+    // Event Listeners
+    summarizeBtn.addEventListener('click', handleSummarize);
+    askBtn.addEventListener('click', handleAskQuestion);
+    clearBtn.addEventListener('click', clearAll);
+    
+    // Allow Enter key to submit questions
+    questionInput.addEventListener('keypress', function(e) {
         if (e.key === 'Enter') {
-            submitQuestion.click();
+            handleAskQuestion();
         }
     });
 
-    // Helper function to handle API requests
-    async function processRequest(endpoint, data, responseKey) {
-        showLoading(true);
-        output.textContent = '';
+    // Handle Summarize button click
+    async function handleSummarize() {
+        const text = documentText.value.trim();
+        
+        if (!text) {
+            showError('Please enter some text to summarize');
+            return;
+        }
 
         try {
-            const response = await fetch(endpoint, {
+            showLoading(true);
+            const response = await fetch('/api/summarize', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(data)
+                body: JSON.stringify({ text })
             });
 
-            const result = await response.json();
-
+            const data = await response.json();
+            
             if (!response.ok) {
-                throw new Error(result.error || 'Something went wrong');
+                throw new Error(data.error || 'Failed to generate summary');
             }
 
-            // Display the result
-            output.innerHTML = formatOutput(result[responseKey], responseKey);
+            displayOutput(data.summary || 'No summary generated');
         } catch (error) {
-            output.textContent = `Error: ${error.message}`;
+            showError(error.message || 'An error occurred while summarizing the document');
             console.error('Error:', error);
         } finally {
             showLoading(false);
         }
     }
 
-    // Format the output with proper styling
-    function formatOutput(text, type) {
-        if (type === 'summary') {
-            // Convert markdown-like bullet points to HTML
-            return text.split('\n').map(line => {
-                if (line.startsWith('- ')) {
-                    return `<p>• ${line.substring(2)}</p>`;
-                }
-                return `<p>${line}</p>`;
-            }).join('');
+    // Handle Ask Question button click
+    async function handleAskQuestion() {
+        const text = documentText.value.trim();
+        const question = questionInput.value.trim();
+        
+        if (!text) {
+            showError('Please enter a document first');
+            return;
         }
-        return `<p><strong>Answer:</strong> ${text}</p>`;
+        
+        if (!question) {
+            showError('Please enter a question');
+            return;
+        }
+
+        try {
+            showLoading(true);
+            const response = await fetch('/api/ask', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ text, question })
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to get an answer');
+            }
+
+            displayOutput(`Q: ${question}\n\nA: ${data.answer}`);
+            questionInput.value = ''; // Clear the question input
+        } catch (error) {
+            showError(error.message || 'An error occurred while processing your question');
+            console.error('Error:', error);
+        } finally {
+            showLoading(false);
+        }
     }
 
-    // Show/hide loading indicator
-    function showLoading(show) {
-        loading.style.display = show ? 'flex' : 'none';
+    // Display output in the output div
+    function displayOutput(content) {
+        outputDiv.textContent = content;
     }
+
+    // Show error message
+    function showError(message) {
+        outputDiv.innerHTML = `<div class="error-message">${message}</div>`;
+    }
+
+    // Show/hide loading spinner
+    function showLoading(show) {
+        loadingSpinner.style.display = show ? 'flex' : 'none';
+        if (!show) {
+            outputDiv.style.display = 'block';
+        }
+    }
+
+    // Clear all inputs and outputs
+    function clearAll() {
+        documentText.value = '';
+        questionInput.value = '';
+        outputDiv.textContent = '';
+    }
+
+    // Initialize the UI
+    function init() {
+        outputDiv.textContent = 'Your results will appear here...';
+    }
+
+    // Initialize the application
+    init();
 });

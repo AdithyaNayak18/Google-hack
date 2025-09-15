@@ -1,6 +1,2 @@
-# legal-ai-assistant/app/__init__.py
-from flask import Flask
-
-def create_app():
-    app = Flask(__name__)
-    return app
+# legal-ai-assistant/app/services/__init__.py
+# This file makes the services directory a Python package
